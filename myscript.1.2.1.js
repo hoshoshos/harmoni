@@ -1,7 +1,3 @@
-<!-- 2026-11-13 15:03:05 hoshoshos -->
-
-<!-- ***** Renderer ***** -->
-<script type="text/JavaScript">
 function renderRekap(res) {
   // proses card saldo
   const fragment = document.createDocumentFragment();
@@ -221,10 +217,7 @@ function renderTblJimpitan(isNew,res) {
   });
   carouselJimpitan.append(fragment);
 }
-</script>
 
-<!-- ***** Function init ***** -->
-<script type="text/JavaScript">
 function loadRekap() {
   let btn = document.getElementById('btnMuat');
   btn.disabled = true;
@@ -296,10 +289,7 @@ function loadJimpitan(isNew) {
     });
   });
 }
-</script>
 
-<!-- ***** Function onClick ***** -->
-<script type="text/JavaScript">
 function pageRekap() {
   if(!document.getElementById('kasContainer') || !document.getElementById('tbl-iuran')) return;
   allTbl.tblIuran = new Tabulator('#tbl-iuran', {
@@ -394,10 +384,7 @@ function pageJimpitan() {
 
   loadJimpitan(true);
 }
-</script>
 
-<!-- ***** Function utama ***** -->
-<script type="text/JavaScript">
   function pindahHalaman(namaFileMenu,fungsiInit,elemenKlik) {
     Swal.fire({
       html:`<div class="mt-2 text-muted">Memuat <strong>${namaFileMenu}</strong>, mohon tunggu.</div>`,
@@ -489,10 +476,7 @@ function pageJimpitan() {
       runner[fname].apply(null, params);
     });
   }
-</script>
 
-<!-- ***** Event listener ***** -->
-<script type="text/JavaScript">
   window.addEventListener('DOMContentLoaded', function() {
     prosesLog();
 
@@ -531,4 +515,3 @@ function pageJimpitan() {
 
     pindahHalaman('Rekap','pageRekap');
   });
-</script>
