@@ -47,7 +47,7 @@ function renderRekap(res) {
       }
       tempGroups[h.main].columns.push({
         title:h.sub, field:h.field, hozAlign:'right', headerSort:false,
-        print:h.main === 'Total Kekurangan', htmlOutput:h.main === 'Total Kekurangan',
+        //print:h.main === 'Total Kekurangan', htmlOutput:h.main === 'Total Kekurangan',
         width: h.sub === 'Bulanan' || h.sub === 'Jumlah' ? 80 : 110,
         minWidth: h.sub === 'Bulanan' || h.sub === 'Jumlah' ? 80 : 110,
         maxWidth: h.sub === 'Bulanan' || h.sub === 'Jumlah' ? 80 : 110,
@@ -201,32 +201,33 @@ function renderTblJimpitan(isNew,res) {
   });
   listChkJimpitan.append(fragment);
 
-  const carouselJimpitan = document.querySelector('#carouselJimpitan>.carousel-inner');
-  carouselJimpitan.innerHTML = '';
-  res.scan.forEach(function(berkas,idx) {
-    const lbl = `Berkas ${FormatBulanTahun.format(new Date(2026, 4+idx, 1))}`;
-    let item = document.createElement('div');
-    item.className = idx === 0 ? 'carousel-item active' : 'carousel-item';
-    item.innerHTML = `
-      <img src="https://drive.google.com/thumbnail?id=${berkas}&sz=w900" class="d-block w-100">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>${lbl}</h5>
-      </div>
-    `;
-    fragment.append(item);
+  const btnBerkasJimpitan = document.getElementById('btn-berkas-jimpitan');
+  btnBerkasJimpitan.innerHTML = '';
+  res.embed.forEach(function(url,idx) {
+    const lbl = `Formulir ${idx+2026}`;
+    let btn = document.createElement('button');
+    btn.className = 'btn btn-sm btn-outline-primary';
+    btn.type = 'button';
+    btn.title = 'Lihat Berkas';
+    btn.textContent = lbl;
+    btn.dataset.bsToggle = 'modal';
+    btn.dataset.bsTarget = '#modalBerkas';
+    btn.dataset.id = url;
+    btn.dataset.txt = lbl;
+    fragment.append(btn);
   });
-  carouselJimpitan.append(fragment);
+  btnBerkasJimpitan.append(fragment);
 }
 
 function loadRekap() {
   let btn = document.getElementById('btnMuat');
   btn.disabled = true;
-  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Memuat';
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
   ambilDataServer('getRekap')
   .then((res) => {
     document.getElementById('kasContainer').innerHTML = '';
     btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh';
+    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
     Notif.fire({icon:'success', text:'Berhasil mengambil data.'});
     renderRekap(res);
   })
@@ -243,13 +244,13 @@ function loadRekap() {
 function loadTransaksi() {
   let btn = document.getElementById('btnMuat');
   btn.disabled = true;
-  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Memuat';
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
   ambilDataServer('getTransaksi')
   .then((res) => {
     document.getElementById('trans-aktif').innerHTML = '';
     document.getElementById('trans-arsip').innerHTML = '';
     btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh';
+    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
     Notif.fire({icon:'success', text:'Berhasil mengambil data.'});
     renderTblTransaksi(res);
   })
@@ -266,12 +267,12 @@ function loadTransaksi() {
 function loadJimpitan(isNew) {
   let btn = document.getElementById('btnMuat');
   btn.disabled = true;
-  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Memuat';
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
 
   ambilDataServer('getJimpitan')
   .then((res) => {
     btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh';
+    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
     if(!res.message) {
       renderTblJimpitan(isNew,res)
       Notif.fire({icon:'success', text:'Berhasil mengambil data.'});
@@ -368,150 +369,146 @@ function pageJimpitan() {
     .filter(c => c.isVisible() && c.getDefinition().title !== 'Tanggal')
     .map(c => c.getField());
 
-    let totalIsi = 0;
     let totalKosong = 0;
     allTbl.tblJimpitan.getData('active').forEach(row => {
       kolomAktif.forEach(field => {
         let nilaiCell = row[field];
-        if (nilaiCell === '✅') totalIsi++;
         if (nilaiCell === '⚠️') totalKosong++;
       });
     });
-
-    document.getElementById('jimpitanIsi').textContent = totalIsi;
     document.getElementById('jimpitanKosong').textContent = totalKosong;
   });
 
   loadJimpitan(true);
 }
 
-  function pindahHalaman(namaFileMenu,fungsiInit,elemenKlik) {
+function pindahHalaman(namaFileMenu,fungsiInit,elemenKlik) {
+  Swal.fire({
+    html:`<div class="mt-2 text-muted">Memuat <strong>${namaFileMenu}</strong>, mohon tunggu.</div>`,
+    allowOutsideClick:false, allowEscapeKey:false, focusConfirm:false, showConfirmButton:false,
+    didOpen:()=>{Swal.showLoading()}
+  });
+
+  // Cek apakah menu di HP sedang terbuka (Bootstrap menandainya dengan kelas "show")
+  let panelMenu = document.getElementById('navbarNav');
+  let tombolToggler = document.querySelector('.navbar-toggler');
+  if (panelMenu && panelMenu.classList.contains('show') && tombolToggler) {tombolToggler.click()}
+
+  Object.keys(allTbl).forEach(key => {
+    allTbl[key]?.destroy?.();
+    allTbl[key] = null;
+  });
+
+  if (elemenKlik) {
+    document.querySelectorAll('.nav-link-menu').forEach(function(menu) {
+      menu.classList.remove('text-white'); menu.classList.add('text-white-50');
+    });
+    elemenKlik.classList.remove('text-white-50'); elemenKlik.classList.add('text-white');
+  }
+
+  google.script.run
+  .withSuccessHandler(function(resHTML) {
+    document.querySelector('main#konten-utama').innerHTML = resHTML;
+    Swal.close();
+    setTimeout(function() {
+      if (fungsiInit && typeof window[fungsiInit] === 'function') window[fungsiInit]();
+    },100);
+  })
+  .withFailureHandler(function(err) {
+    Swal.fire({icon:'error', title:'Gagal Memuat', text: err.message, confirmButtonText:'OK'});
+  })
+  .include(namaFileMenu);
+}
+
+function ambilDataServer(fname,params=[],durasi=20) {
+  return new Promise((resolve,reject) => {
+    let sisaWaktu = durasi;
+    let countdownTimer;
+    let appStatus = 'memuat';
+
     Swal.fire({
-      html:`<div class="mt-2 text-muted">Memuat <strong>${namaFileMenu}</strong>, mohon tunggu.</div>`,
-      allowOutsideClick:false, allowEscapeKey:false, focusConfirm:false, showConfirmButton:false,
-      didOpen:()=>{Swal.showLoading()}
+      html:`
+      <div class="my-3">
+        <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+        <p class="text-secondary fw-semibold mb-1">Mengambil Data</p>
+        <div class="badge bg-light text-secondary border p-2 fs-6 mt-2">
+          <i class="bi bi-stopwatch"></i>&nbsp;<span id="swal-countdown" class="text-danger fw-bold">${sisaWaktu}</span> detik
+        </div>
+      </div>`,
+      allowOutsideClick:false, allowEscapeKey:false, showConfirmButton:false,
+      didOpen: () => {
+        countdownTimer = setInterval(() => {
+          sisaWaktu--;
+          const elCountdown = document.getElementById('swal-countdown');
+          if (elCountdown) elCountdown.textContent = sisaWaktu;
+          if (sisaWaktu <= 0) {
+            clearInterval(countdownTimer);
+            if (appStatus === 'memuat') {
+              appStatus = 'timeout';
+              Swal.close();
+              reject(new Error(`Koneksi terputus atau respons terlalu lama (${durasi} detik).`));
+            }
+          }
+        },1000);
+      },
+      willClose: () => clearInterval(countdownTimer)
     });
 
-    // Cek apakah menu di HP sedang terbuka (Bootstrap menandainya dengan kelas "show")
-    let panelMenu = document.getElementById('navbarNav');
-    let tombolToggler = document.querySelector('.navbar-toggler');
-    if (panelMenu && panelMenu.classList.contains('show') && tombolToggler) {tombolToggler.click()}
-
-    Object.keys(allTbl).forEach(key => {
-      allTbl[key]?.destroy?.();
-      allTbl[key] = null;
-    });
-
-    if (elemenKlik) {
-      document.querySelectorAll('.nav-link-menu').forEach(function(menu) {
-        menu.classList.remove('text-white'); menu.classList.add('text-white-50');
-      });
-      elemenKlik.classList.remove('text-white-50'); elemenKlik.classList.add('text-white');
-    }
-
-    google.script.run
-    .withSuccessHandler(function(resHTML) {
-      document.querySelector('main#konten-utama').innerHTML = resHTML;
+    // Eksekusi Dinamis google.script.run berdasarkan teks string nama fungsi
+    const runner = google.script.run
+    .withSuccessHandler(function(res) {
+      clearInterval(countdownTimer);
+      if (appStatus === 'timeout') return; 
+      appStatus = 'sukses';
       Swal.close();
-      setTimeout(function() {
-        if (fungsiInit && typeof window[fungsiInit] === 'function') window[fungsiInit]();
-      },100);
+      resolve(res);
     })
     .withFailureHandler(function(err) {
-      Swal.fire({icon:'error', title:'Gagal Memuat', text: err.message, confirmButtonText:'OK'});
-    })
-    .include(namaFileMenu);
-  }
-
-  function ambilDataServer(fname,params=[],durasi=20) {
-    return new Promise((resolve,reject) => {
-      let sisaWaktu = durasi;
-      let countdownTimer;
-      let appStatus = 'memuat';
-
-      Swal.fire({
-        html:`
-        <div class="my-3">
-          <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
-          <p class="text-secondary fw-semibold mb-1">Mengambil Data</p>
-          <div class="badge bg-light text-secondary border p-2 fs-6 mt-2">
-            <i class="bi bi-stopwatch"></i>&nbsp;<span id="swal-countdown" class="text-danger fw-bold">${sisaWaktu}</span> detik
-          </div>
-        </div>`,
-        allowOutsideClick:false, allowEscapeKey:false, showConfirmButton:false,
-        didOpen: () => {
-          countdownTimer = setInterval(() => {
-            sisaWaktu--;
-            const elCountdown = document.getElementById('swal-countdown');
-            if (elCountdown) elCountdown.textContent = sisaWaktu;
-            if (sisaWaktu <= 0) {
-              clearInterval(countdownTimer);
-              if (appStatus === 'memuat') {
-                appStatus = 'timeout';
-                Swal.close();
-                reject(new Error(`Koneksi terputus atau respons terlalu lama (${durasi} detik).`));
-              }
-            }
-          },1000);
-        },
-        willClose: () => clearInterval(countdownTimer)
-      });
-
-      // Eksekusi Dinamis google.script.run berdasarkan teks string nama fungsi
-      const runner = google.script.run
-      .withSuccessHandler(function(res) {
-        clearInterval(countdownTimer);
-        if (appStatus === 'timeout') return; 
-        appStatus = 'sukses';
-        Swal.close();
-        resolve(res);
-      })
-      .withFailureHandler(function(err) {
-        clearInterval(countdownTimer);
-        if (appStatus === 'timeout') return;
-        appStatus = 'gagal';
-        Swal.close();
-        reject(err);
-      });
-      runner[fname].apply(null, params);
+      clearInterval(countdownTimer);
+      if (appStatus === 'timeout') return;
+      appStatus = 'gagal';
+      Swal.close();
+      reject(err);
     });
-  }
+    runner[fname].apply(null, params);
+  });
+}
 
-  window.addEventListener('DOMContentLoaded', function() {
-    prosesLog();
+window.addEventListener('DOMContentLoaded', function() {
+  prosesLog();
 
-    const kontenUtama = document.querySelector('main#konten-utama');
-    kontenUtama.addEventListener('change', function(e) {
-      // Cek apakah yang diubah adalah switch dengan class 'toggle-calcs'
-      if (e.target && e.target.classList.contains('toggle-calcs')) {
-        const cardBody = e.target.closest('.card-body');
-        if (cardBody) {
-          cardBody.classList.toggle('show-total', e.target.checked);
-        }
+  const kontenUtama = document.querySelector('main#konten-utama');
+  kontenUtama.addEventListener('change', function(e) {
+    // Cek apakah yang diubah adalah switch dengan class 'toggle-calcs'
+    if (e.target && e.target.classList.contains('toggle-calcs')) {
+      const cardBody = e.target.closest('.card-body');
+      if (cardBody) {
+        cardBody.classList.toggle('show-total', e.target.checked);
+      }
+    }
+  });
+
+  const modalBerkas = document.getElementById('modalBerkas');
+  if (modalBerkas) {
+    modalBerkas.addEventListener('show.bs.modal', function (event) {
+      const idDrive = event.relatedTarget.getAttribute('data-id');
+      const title = modalBerkas.querySelector('#titleBerkas');
+      const iframe = modalBerkas.querySelector('#modalFrame');
+      
+      if (idDrive && title && iframe) {
+        title.textContent = event.relatedTarget.getAttribute('data-txt');
+        iframe.src = `https://drive.google.com/file/d/${idDrive}/preview`;
       }
     });
+    modalBerkas.addEventListener('hidden.bs.modal', function () {
+      const title = modalBerkas.querySelector('#titleBerkas');
+      const iframe = modalBerkas.querySelector('#modalFrame');
+      if (title && iframe) {
+        title.textContent = 'Pratinjau';
+        iframe.src = '';
+      }
+    });
+  }
 
-    const modalBerkas = document.getElementById('modalBerkas');
-    if (modalBerkas) {
-      modalBerkas.addEventListener('show.bs.modal', function (event) {
-        const idDrive = event.relatedTarget.getAttribute('data-id');
-        const title = modalBerkas.querySelector('#titleBerkas');
-        const iframe = modalBerkas.querySelector('#modalFrame');
-        
-        if (idDrive && title && iframe) {
-          title.textContent = event.relatedTarget.getAttribute('data-txt');
-          iframe.src = `https://drive.google.com/file/d/${idDrive}/preview`;
-        }
-      });
-      modalBerkas.addEventListener('hidden.bs.modal', function () {
-        const title = modalBerkas.querySelector('#titleBerkas');
-        const iframe = modalBerkas.querySelector('#modalFrame');
-        if (title && iframe) {
-          title.textContent = 'Pratinjau';
-          iframe.src = '';
-        }
-      });
-    }
-
-    pindahHalaman('Rekap','pageRekap');
-  });
+  pindahHalaman('Rekap','pageRekap');
+});
