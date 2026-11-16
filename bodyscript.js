@@ -1,4 +1,3 @@
-<script type="text/JavaScript">
 function renderRekap(res) {
   // proses card saldo
   const fragment = document.createDocumentFragment();
@@ -513,4 +512,3 @@ window.addEventListener('DOMContentLoaded', function() {
 
   pindahHalaman('Rekap','pageRekap');
 });
-</script>
