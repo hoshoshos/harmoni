@@ -1,3 +1,4 @@
+<script type="text/JavaScript">
 function renderRekap(res) {
   // proses card saldo
   const fragment = document.createDocumentFragment();
@@ -233,7 +234,7 @@ function loadRekap() {
   })
   .catch((err) => {
     btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh';
+    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
     Swal.fire({
       icon:'error', title:'Error', text:err.message || err,
       confirmButtonText:'OK', allowOutsideClick:false
@@ -256,7 +257,7 @@ function loadTransaksi() {
   })
   .catch((err) => {
     btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh';
+    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
     Swal.fire({
       icon:'error', title:'Error', text:err.message || err,
       confirmButtonText:'OK', allowOutsideClick:false
@@ -283,7 +284,7 @@ function loadJimpitan(isNew) {
   })
   .catch((err) => {
     btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh';
+    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
     Swal.fire({
       icon:'error', title:'Error', text:err.message || err,
       confirmButtonText:'OK', allowOutsideClick:false
@@ -512,3 +513,4 @@ window.addEventListener('DOMContentLoaded', function() {
 
   pindahHalaman('Rekap','pageRekap');
 });
+</script>
