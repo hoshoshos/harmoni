@@ -62,20 +62,4 @@ body {
     -webkit-print-color-adjust: exact; // Untuk Chrome, Safari, Edge
     print-color-adjust: exact; // Standar modern (Firefox, dll)
   }
-
-  /*.tabulator-print-table thead tr th {
-    background: #3A0B11 !important; color: rgba(248,249,250,1)!important;
-  }
-  .tabulator-print-table, .tabulator-print-table th, .tabulator-print-table td {
-    font-size: 12px;
-    border: 1px solid #4a4a4a !important;
-    border-collapse: collapse !important;
-    padding: 6px !important;
-  }
-  .tabulator-print-table tbody tr:nth-child(even) td {
-    background-color: #efefef !important;
-  }
-  .tabulator-print-table td, .tabulator-print-table td *, .tabulator-print-table tr td {
-    background-color: transparent !important;
-  }*/
 }
