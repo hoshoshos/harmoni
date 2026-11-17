@@ -47,6 +47,7 @@ body {
   color: var(--bs-light) !important; background-color: var(--bs-primary) !important;
 }
 .tabulator-cell { white-space: nowrap !important; }
+.tabulator-cell .bi { line-height: 1; vertical-align: middle; }
 .tabulator-row.tabulator-group { background: #cfe2ff !important; }
 .tabulator-row.tabulator-group span { color: #0d6efd !important; }
 .tabulator-row.tabulator-group .tabulator-arrow { border-left: 6px solid #0d6efd !important; }
