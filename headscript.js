@@ -79,15 +79,17 @@ function formatRupiah(num) {
 }
 
 function formatWarnaTagihan(cell,params) {
-  let val = cell.getValue();
+  const val = cell.getValue();
+  if (!val || val === '-') return val;
+
+  let cls = '';
   if (params.main.includes('Kekurangan')) {
-    if (val !== '-' && val !== 'Rp 0') {
-      if (params.sub === 'Jumlah') val = `<span class="text-danger fw-bolder">${val}</span>`;
-      else val = `<span class="text-danger">${val}</span>`;
+    if (val !== 'Rp 0') {
+      cls = params.sub === 'Jumlah' ? 'text-danger fw-bolder' : 'text-danger';
     }
-  } else {
-    if (val.includes('(-')) val = `<span class="text-danger">${val}</span>`;
-    if (val.includes('(+')) val = `<span class="text-primary">${val}</span>`;
   }
-  return val;
+  else if (val === 'Rp 0' || val.includes('(-')) cls = 'text-danger';
+  else if (val.includes('(+')) cls = 'text-primary';
+
+  return cls ? `<span class="${cls}">${val}</span>` : val;
 }
