@@ -115,7 +115,7 @@ function renderTblTransaksi(res) {
     tabulatorTasks.forEach(task => {
       allTbl[task.idTable] = new Tabulator(`#${task.idTable}`, {
         data:res.Histori[status][task.kat], layout:'fitColumns',
-        locale:'en', pagination:'local', paginationSize:7,
+        locale:'en', pagination:'local', paginationSize:10,
         movableColumns:false, columnDefaults:{resizable:false},
         initialSort:[{column:'id', dir:'desc'}],
         columns:[
@@ -311,7 +311,7 @@ function pageTransaksi() {
   ) return;
 
   const tblConfig = {
-    data:[], layout:'fitColumns', movableColumns:false, columnDefaults:{resizable:false}, locale:'en', pagination:'local', paginationSize:7
+    data:[], layout:'fitColumns', movableColumns:false, columnDefaults:{resizable:false}, locale:'en', pagination:'local', paginationSize:10
   }
   const kolomAwal = [
     {title:'Tanggal', field:'tanggal', width:80, headerSort:false, frozen:true, hozAlign:'center'},
